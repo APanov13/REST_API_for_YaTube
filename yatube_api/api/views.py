@@ -1,10 +1,10 @@
 # TODO:  Напишите свой вариант
 from django.shortcuts import get_object_or_404
 from posts.models import Group, Post
-from rest_framework import filters, mixins, permissions, status, viewsets
+from rest_framework import filters, mixins, permissions, viewsets
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.response import Response
 
+from .permissions import OwnerOrReadOnly, ReadOnly
 from .serializers import (
     CommentSerializer, FollowSerializer, GroupSerializer, PostSerializer
 )
@@ -14,28 +14,12 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     pagination_class = LimitOffsetPagination
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = (OwnerOrReadOnly,)
 
-    # У меня вопрос, а могу я на уровне проекта поставить пермишен на
-    # "AllowAny", убрать пермишены на уровне представления с Post и
-    #  Comment ViewSet, что бы как раз наоброт оставить переопледеление
-    # методов updete and destroy?
-    # Если я уберу эти метода у меня начинают падать тесты с кодами ответов
-    # от сервера.
-
-    def update(self, request, *args, **kwargs):
-        user = request.user
-        instance = self.get_object()
-        if instance.author != user:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        return super().update(request, *args, **kwargs)
-
-    def destroy(self, request, *args, **kwargs):
-        user = request.user
-        instance = self.get_object()
-        if instance.author != user:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        return super().destroy(request, *args, **kwargs)
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            return (ReadOnly(),)
+        return super().get_permissions()
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -43,21 +27,12 @@ class PostViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = (OwnerOrReadOnly,)
 
-    def update(self, request, *args, **kwargs):
-        user = request.user
-        instance = self.get_object()
-        if instance.author != user:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        return super().update(request, *args, **kwargs)
-
-    def destroy(self, request, *args, **kwargs):
-        user = request.user
-        instance = self.get_object()
-        if instance.author != user:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        return super().destroy(request, *args, **kwargs)
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            return (ReadOnly(),)
+        return super().get_permissions()
 
     def get_queryset(self):
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
