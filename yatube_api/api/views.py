@@ -1,7 +1,7 @@
 # TODO:  Напишите свой вариант
 from django.shortcuts import get_object_or_404
-from posts.models import Follow, Group, Post
-from rest_framework import filters, permissions, status, viewsets
+from posts.models import Group, Post
+from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
@@ -14,7 +14,14 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    # У меня вопрос, а могу я на уровне проекта поставить пермишен на
+    # "AllowAny", убрать пермишены на уровне представления с Post и
+    #  Comment ViewSet, что бы как раз наоброт оставить переопледеление
+    # методов updete and destroy?
+    # Если я уберу эти метода у меня начинают падать тесты с кодами ответов
+    # от сервера.
 
     def update(self, request, *args, **kwargs):
         user = request.user
@@ -36,7 +43,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def update(self, request, *args, **kwargs):
         user = request.user
@@ -63,21 +70,20 @@ class CommentViewSet(viewsets.ModelViewSet):
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-    def create(self, request, *args, **kwargs):
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    permission_classes = [permissions.AllowAny]
 
 
-class FollowViewSet(viewsets.ModelViewSet):
+class FollowViewSet(
+    mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
+):
+
     serializer_class = FollowSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = (filters.SearchFilter,)
     search_fields = ('following__username',)
 
     def get_queryset(self):
-        user = Follow.objects.filter(user=self.request.user)
-        return user
+        return self.request.user.user.all()
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

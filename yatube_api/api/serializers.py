@@ -27,7 +27,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Group
-        fields = ('__all__')
+        fields = '__all__'
 
 
 class FollowSerializer(serializers.ModelSerializer):
@@ -56,5 +56,5 @@ class FollowSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if self.context['request'].user == data['following']:
             raise serializers.ValidationError(
-                'Подписка на самого себя запрещена')
+                'Нельзя подписаться на самого себя')
         return data
