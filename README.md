@@ -1,7 +1,7 @@
 # REST API для проекта Yatube.
 
 ### Описание
-API сервис для проекта [YaTube](https://github.com/APanov13/YaTube)
+API сервис для проекта [Платформы для блогов YaTube](https://github.com/APanov13/YaTube)<br />
 Аутентификация по JWT-токену
 
 Работает со всеми модулями социальной сети Yatube: постами, комментариями, группами, подписчиками
