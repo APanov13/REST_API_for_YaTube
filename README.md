@@ -24,7 +24,7 @@ git clone git@github.com:APanov13/REST_API_for_YaTube.git
 Создать и активировать виртуальное окружение:
 ```
 python -m venv venv
-```
+
 source venv/bin/activate
 ```
 Установить зависимости из файла requirements.txt:
