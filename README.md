@@ -39,3 +39,23 @@ python manage.py migrate
 ```
 python manage.py runserver
 ```
+
+### Примеры запросов и ответов API  
+
+#### Добавление произведения  
+
+  
+  `POST /api/v1/titles/`
+##### Ответ API:
+
+```json
+{
+"name": "string",
+"year": 0,
+"description": "string",
+"genre": [
+"string"
+],
+"category": "string"
+}
+```
