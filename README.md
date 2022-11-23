@@ -43,17 +43,17 @@ python manage.py runserver
 ### Примеры запросов и ответов API  
 
 #### Добавление публикации  
-
-  
   `POST /api/v1/posts`
 ##### Ответ API:
 
 ```json
 {
-    "id": 3,
-    "author": "monicageller",
-    "text": "Chandler and I are getting married!",
-    "pub_date": "2020-12-25T10:40:32.710136Z",
+    "id": 1,
+    "author": "test_author",
+    "text": "test_text",
+    "pub_date": "2022-10-15T12:22:12.710136Z",
     "group": null
 }
 ```
+#### Добавление публикации  
+  `GET /api/v1/posts`
